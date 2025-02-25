@@ -992,22 +992,22 @@ preprocessornd = ColumnTransformer([
 # ### benchmarking K-Fold untuk data train
 
 # %%
-models = [LinearRegression(),Lasso(max_iter=10000),Ridge(),KNeighborsRegressor(),DecisionTreeRegressor(),RandomForestRegressor(), GradientBoostingRegressor(), XGBRegressor(), LGBMRegressor(force_col_wise=True)]
-score=[]
-rata=[]
-std=[]
+# models = [LinearRegression(),Lasso(max_iter=10000),Ridge(),KNeighborsRegressor(),DecisionTreeRegressor(),RandomForestRegressor(), GradientBoostingRegressor(), XGBRegressor(), LGBMRegressor(force_col_wise=True)]
+# score=[]
+# rata=[]
+# std=[]
 
-for i in models:
-    skfold=KFold(n_splits=5)
-    estimator=Pipeline([
-        ('preprocess',preprocessornd),
-        ('model',i)])
-    model_cv=cross_val_score(estimator,X_train,y_train,cv=skfold,scoring='r2', error_score='raise')
-    score.append(model_cv)
-    rata.append(model_cv.mean())
-    std.append(model_cv.std())
+# for i in models:
+#     skfold=KFold(n_splits=5)
+#     estimator=Pipeline([
+#         ('preprocess',preprocessornd),
+#         ('model',i)])
+#     model_cv=cross_val_score(estimator,X_train,y_train,cv=skfold,scoring='r2', error_score='raise')
+#     score.append(model_cv)
+#     rata.append(model_cv.mean())
+#     std.append(model_cv.std())
     
-pd.DataFrame({'model':['Linear Regression', 'Lasso', 'Ridge', 'KNeighbors', 'Decision Tree', 'Random Forest', 'Gradient Boosting', 'XGBoost', 'LightGBM'],'mean r2_score':rata,'sdev':std}).set_index('model').sort_values(by='mean r2_score',ascending=False)
+# pd.DataFrame({'model':['Linear Regression', 'Lasso', 'Ridge', 'KNeighbors', 'Decision Tree', 'Random Forest', 'Gradient Boosting', 'XGBoost', 'LightGBM'],'mean r2_score':rata,'sdev':std}).set_index('model').sort_values(by='mean r2_score',ascending=False)
 
 # %% [markdown]
 # ini berarti,    
@@ -1897,58 +1897,58 @@ pd.DataFrame({'model':['Linear Regression', 'Lasso', 'Ridge', 'KNeighbors', 'Dec
 # ### Ensemble - Stacking Regressor
 
 # %%
-base_models = [
-    ('lr', LinearRegression()),
-    ('dt', DecisionTreeRegressor())
-]
-meta_model = RandomForestRegressor(random_state=42)
-stacking_regressor = StackingRegressor(estimators=base_models, final_estimator=meta_model)
+# base_models = [
+#     ('lr', LinearRegression()),
+#     ('dt', DecisionTreeRegressor())
+# ]
+# meta_model = RandomForestRegressor(random_state=42)
+# stacking_regressor = StackingRegressor(estimators=base_models, final_estimator=meta_model)
 
-StackingRegressorModel =  Pipeline([
-    ('preprocessor', preprocessor),
-    ('stacking_regressor', stacking_regressor)
-])
+# StackingRegressorModel =  Pipeline([
+#     ('preprocessor', preprocessor),
+#     ('stacking_regressor', stacking_regressor)
+# ])
 
-StackingRegressorModel.fit(X_train, y_train)
+# StackingRegressorModel.fit(X_train, y_train)
 
-# %% [markdown]
-# stacking regressor model adalah meta_learner yang mencombinasikan beberapa regression model untuk meningkatkan predictive performancenya. bekerja dengan men-train beberapa base regressor pada dataset yang sama, dan menggunkan prediksi mereka  sebagai input pada sebuah final estimator (meta_tregressor), yang kan membuat final predictionnya. methode ini menggunkan kekuatan dari beberapa algorithm, mengurangi overfitting dan meningkatkan aaccuracy dengan menggabungkan prediksi yang berbeda-beda. stacking regressor effecitve pada base models yang memiliki strenght yang mengcomplement satu sama lain, membuatnya menjadi tool yang versatile dan powerful untuk regresi. 
+# # %% [markdown]
+# # stacking regressor model adalah meta_learner yang mencombinasikan beberapa regression model untuk meningkatkan predictive performancenya. bekerja dengan men-train beberapa base regressor pada dataset yang sama, dan menggunkan prediksi mereka  sebagai input pada sebuah final estimator (meta_tregressor), yang kan membuat final predictionnya. methode ini menggunkan kekuatan dari beberapa algorithm, mengurangi overfitting dan meningkatkan aaccuracy dengan menggabungkan prediksi yang berbeda-beda. stacking regressor effecitve pada base models yang memiliki strenght yang mengcomplement satu sama lain, membuatnya menjadi tool yang versatile dan powerful untuk regresi. 
 
-# %%
-y_pred_tr_sr = StackingRegressorModel.predict(X_train)
-y_pred_ts_sr = StackingRegressorModel.predict(X_test)
+# # %%
+# y_pred_tr_sr = StackingRegressorModel.predict(X_train)
+# y_pred_ts_sr = StackingRegressorModel.predict(X_test)
 
-medae_train = median_absolute_error(y_train, y_pred_tr_sr)
-medae_test = median_absolute_error(y_test, y_pred_ts_sr)
-medae_diff = medae_test - medae_train
-mae_train = mean_absolute_error(y_train, y_pred_tr_sr)
-mae_test = mean_absolute_error(y_test, y_pred_ts_sr)
-mae_diff = mae_test - mae_train
-mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_sr)
-mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_sr)
+# medae_train = median_absolute_error(y_train, y_pred_tr_sr)
+# medae_test = median_absolute_error(y_test, y_pred_ts_sr)
+# medae_diff = medae_test - medae_train
+# mae_train = mean_absolute_error(y_train, y_pred_tr_sr)
+# mae_test = mean_absolute_error(y_test, y_pred_ts_sr)
+# mae_diff = mae_test - mae_train
+# mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_sr)
+# mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_sr)
 
-row = {
-    'model_name': 'Stacking Regressor Regression',
-    'MedAE_train': medae_train,
-    'MedAE_Test': medae_test,
-    'MedAE_diff': medae_diff,
-    'MAE_train': mae_train,
-    'MAE_Test': mae_test,
-    'MAE_diff': mae_diff,
-    'MAPE_train': mape_train,
-    'MAPE_Test': mape_test
-}
+# row = {
+#     'model_name': 'Stacking Regressor Regression',
+#     'MedAE_train': medae_train,
+#     'MedAE_Test': medae_test,
+#     'MedAE_diff': medae_diff,
+#     'MAE_train': mae_train,
+#     'MAE_Test': mae_test,
+#     'MAE_diff': mae_diff,
+#     'MAPE_train': mape_train,
+#     'MAPE_Test': mape_test
+# }
 
-# scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
-scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
+# # scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
+# scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
 
-print(f"""
-    Stacking Regressor Regression : 
-    train MedAE score : {medae_train}
-    test MedAE score : {medae_test}
-    train MAE Score : {mae_train}
-    test MAE Score : {mae_test}
-""")
+# print(f"""
+#     Stacking Regressor Regression : 
+#     train MedAE score : {medae_train}
+#     test MedAE score : {medae_test}
+#     train MAE Score : {mae_train}
+#     test MAE Score : {mae_test}
+# """)
 
 # %% [markdown]
 # ### Tuned Ensemble - Stacking Regressor
@@ -2019,76 +2019,76 @@ print(f"""
 # ### XGBoost
 
 # %%
-XGBModel =  Pipeline([
-    ('preprocessor', preprocessor),
-    ('stacking_regressor', XGBRegressor())
-])
+# XGBModel =  Pipeline([
+#     ('preprocessor', preprocessor),
+#     ('stacking_regressor', XGBRegressor())
+# ])
 
-XGBModel.fit(X_train, y_train)
+# XGBModel.fit(X_train, y_train)
 
-# %% [markdown]
-# XGBoost adalah optimized distributed gradient boosting library yang di designed untuk mejadi sangat efficient, flexible, dan portable. menggunakan algorithm dari gradiet boosting framework. xgboost menyediakan paraller tree boosting yang dapat menyelesaikan banyak masalah data science dengan cepat dan accurate. 
+# # %% [markdown]
+# # XGBoost adalah optimized distributed gradient boosting library yang di designed untuk mejadi sangat efficient, flexible, dan portable. menggunakan algorithm dari gradiet boosting framework. xgboost menyediakan paraller tree boosting yang dapat menyelesaikan banyak masalah data science dengan cepat dan accurate. 
 
-# %%
-y_pred_tr_xgb = XGBModel.predict(X_train)
-y_pred_ts_xgb = XGBModel.predict(X_test)
+# # %%
+# y_pred_tr_xgb = XGBModel.predict(X_train)
+# y_pred_ts_xgb = XGBModel.predict(X_test)
 
-medae_train = median_absolute_error(y_train, y_pred_tr_xgb)
-medae_test = median_absolute_error(y_test, y_pred_ts_xgb)
-medae_diff = medae_test - medae_train
-mae_train = mean_absolute_error(y_train, y_pred_tr_xgb)
-mae_test = mean_absolute_error(y_test, y_pred_ts_xgb)
-mae_diff = mae_test - mae_train
-mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_xgb)
-mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_xgb)
+# medae_train = median_absolute_error(y_train, y_pred_tr_xgb)
+# medae_test = median_absolute_error(y_test, y_pred_ts_xgb)
+# medae_diff = medae_test - medae_train
+# mae_train = mean_absolute_error(y_train, y_pred_tr_xgb)
+# mae_test = mean_absolute_error(y_test, y_pred_ts_xgb)
+# mae_diff = mae_test - mae_train
+# mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_xgb)
+# mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_xgb)
 
-row = {
-    'model_name': 'XGBoost Regression',
-    'MedAE_train': medae_train,
-    'MedAE_Test': medae_test,
-    'MedAE_diff': medae_diff,
-    'MAE_train': mae_train,
-    'MAE_Test': mae_test,
-    'MAE_diff': mae_diff,
-    'MAPE_train': mape_train,
-    'MAPE_Test': mape_test
-}
+# row = {
+#     'model_name': 'XGBoost Regression',
+#     'MedAE_train': medae_train,
+#     'MedAE_Test': medae_test,
+#     'MedAE_diff': medae_diff,
+#     'MAE_train': mae_train,
+#     'MAE_Test': mae_test,
+#     'MAE_diff': mae_diff,
+#     'MAPE_train': mape_train,
+#     'MAPE_Test': mape_test
+# }
 
-# scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
-scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
+# # scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
+# scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
 
-print(f"""
-    XGBoost Regression : 
-    train MedAE score : {medae_train}
-    test MedAE score : {medae_test}
-    train MAE Score : {mae_train}
-    test MAE Score : {mae_test}
-""")
+# print(f"""
+#     XGBoost Regression : 
+#     train MedAE score : {medae_train}
+#     test MedAE score : {medae_test}
+#     train MAE Score : {mae_train}
+#     test MAE Score : {mae_test}
+# """)
 
-# %% [markdown]
-# ### Tuned XGBoost
+# # %% [markdown]
+# # ### Tuned XGBoost
 
-# %%
-TunedXGBModel = Pipeline([
-    ('preprocessor', preprocessor),
-    ('regressor', XGBRegressor())
-])
+# # %%
+# TunedXGBModel = Pipeline([
+#     ('preprocessor', preprocessor),
+#     ('regressor', XGBRegressor())
+# ])
 
-skf = KFold(n_splits=5, random_state=42, shuffle=True)
-param_XGB = { 
-    'regressor__n_estimators': randint(100, 1001),
-    'regressor__max_depth': randint(3, 11),
-    'regressor__learning_rate': uniform(0.01, 0.3),
-    'regressor__min_child_weight': randint(1, 11),
-    'regressor__gamma': uniform(0, 1),
-    'regressor__reg_alpha': uniform(0, 1),
-    'regressor__reg_lambda': uniform(0, 1)
-}
+# skf = KFold(n_splits=5, random_state=42, shuffle=True)
+# param_XGB = { 
+#     'regressor__n_estimators': randint(100, 1001),
+#     'regressor__max_depth': randint(3, 11),
+#     'regressor__learning_rate': uniform(0.01, 0.3),
+#     'regressor__min_child_weight': randint(1, 11),
+#     'regressor__gamma': uniform(0, 1),
+#     'regressor__reg_alpha': uniform(0, 1),
+#     'regressor__reg_lambda': uniform(0, 1)
+# }
 
-scoring = { 'Median_Absolute_Error': 'neg_median_absolute_error', 'Mean_Absolute_Error': 'neg_mean_absolute_error' }
+# scoring = { 'Median_Absolute_Error': 'neg_median_absolute_error', 'Mean_Absolute_Error': 'neg_mean_absolute_error' }
 
-RSCV_XGB = RandomizedSearchCV(TunedXGBModel, param_XGB, cv=skf, scoring=scoring, refit='Median_Absolute_Error', n_jobs=12, error_score='raise')
-RSCV_XGB.fit(X_train, y_train)
+# RSCV_XGB = RandomizedSearchCV(TunedXGBModel, param_XGB, cv=skf, scoring=scoring, refit='Median_Absolute_Error', n_jobs=12, error_score='raise')
+# RSCV_XGB.fit(X_train, y_train)
 
 # %% [markdown]
 # tuning parameter XGBoost,
@@ -2103,128 +2103,128 @@ RSCV_XGB.fit(X_train, y_train)
 # - reg_lambda : L1 regularization term pada weights. menambahkan nilai ini membuat cmodel semakin conservative. 
 
 # %%
-RSCV_XGB.best_score_
+# RSCV_XGB.best_score_
 
-# %%
-pd.DataFrame(RSCV_XGB.cv_results_)[pd.DataFrame(RSCV_XGB.cv_results_)['rank_test_Median_Absolute_Error'] == 1][['params', 'mean_test_Median_Absolute_Error']]
+# # %%
+# pd.DataFrame(RSCV_XGB.cv_results_)[pd.DataFrame(RSCV_XGB.cv_results_)['rank_test_Median_Absolute_Error'] == 1][['params', 'mean_test_Median_Absolute_Error']]
 
-# %%
-best_params = {k.split('__')[1]: v for k, v in RSCV_XGB.best_params_.items() if k.split('__')[1] in ['max_depth', 'learning_rate', 'n_estimators', 'min_child_weight', 'subsample', 'gamma', 'colsample_bytree', 'reg_alpha', 'reg_lambda']}
+# # %%
+# best_params = {k.split('__')[1]: v for k, v in RSCV_XGB.best_params_.items() if k.split('__')[1] in ['max_depth', 'learning_rate', 'n_estimators', 'min_child_weight', 'subsample', 'gamma', 'colsample_bytree', 'reg_alpha', 'reg_lambda']}
 
-BestXGBModel = Pipeline([
-    ('preprocessor', preprocessornd),
-    ('regressor', XGBRegressor(**best_params))
-])
+# BestXGBModel = Pipeline([
+#     ('preprocessor', preprocessornd),
+#     ('regressor', XGBRegressor(**best_params))
+# ])
 
-# Fit the pipeline on the training data
-BestXGBModel.fit(X_train, y_train)
+# # Fit the pipeline on the training data
+# BestXGBModel.fit(X_train, y_train)
 
-# %%
-y_pred_tr_xgb_b = BestXGBModel.predict(X_train)
-y_pred_ts_xgb_b = BestXGBModel.predict(X_test)
+# # %%
+# y_pred_tr_xgb_b = BestXGBModel.predict(X_train)
+# y_pred_ts_xgb_b = BestXGBModel.predict(X_test)
 
-medae_train = median_absolute_error(y_train, y_pred_tr_xgb_b)
-medae_test = median_absolute_error(y_test, y_pred_ts_xgb_b)
-medae_diff = medae_test - medae_train
-mae_train = mean_absolute_error(y_train, y_pred_tr_xgb_b)
-mae_test = mean_absolute_error(y_test, y_pred_ts_xgb_b)
-mae_diff = mae_test - mae_train
-mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_xgb_b)
-mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_xgb_b)
+# medae_train = median_absolute_error(y_train, y_pred_tr_xgb_b)
+# medae_test = median_absolute_error(y_test, y_pred_ts_xgb_b)
+# medae_diff = medae_test - medae_train
+# mae_train = mean_absolute_error(y_train, y_pred_tr_xgb_b)
+# mae_test = mean_absolute_error(y_test, y_pred_ts_xgb_b)
+# mae_diff = mae_test - mae_train
+# mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_xgb_b)
+# mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_xgb_b)
 
-row = {
-    'model_name': 'Tuned XGBoost Regression',
-    'MedAE_train': medae_train,
-    'MedAE_Test': medae_test,
-    'MedAE_diff': medae_diff,
-    'MAE_train': mae_train,
-    'MAE_Test': mae_test,
-    'MAE_diff': mae_diff,
-    'MAPE_train': mape_train,
-    'MAPE_Test': mape_test
-}
-
-
-# scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
-scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
-
-print(f"""
-    Tuned XGBoost Regression : 
-    train MedAE score : {medae_train}
-    test MedAE score : {medae_test}
-    train MAE Score : {mae_train}
-    test MAE Score : {mae_test}
-""")
-
-# %% [markdown]
-# ### LightGBM
-
-# %%
-LGBMModel = Pipeline([
-    ('preprocessor', preprocessornd),
-    ('stacking_regressor', LGBMRegressor())
-])
-
-LGBMModel.fit(X_train, y_train)
-
-# %% [markdown]
-# LightGBM adlah sebuah gradient boosting framework yang menggunakan tree based learning algorithm, yang di design untuk di-distribusikan dan efficient. 
-# perbedaannya XGBoost,
-# 1. **Kecepatan dan Efisiensi**:
-# - **LightGBM**: Menggunakan algorithm berbasis histogram dan mendukung pertumbuhan pohon berdasarkan leaf-wise (best-first). Hal ini memungkinkan LightGBM menjadi lebih cepat dan lebih hemat memori, terutama dengan large dataset.
-# - **XGBoost**: Menggunakan pertumbuhan pohon depth-wise (kedalaman), yang dapat lebih lambat dan menghabiskan lebih banyak memori dibandingkan dengan LightGBM.
-# 
-# 2. **Penanganan largedataset**:
-# - **LightGBM**: Dapat menangani large dataset dengan lebih efisien karena pendekatan berbasis histogram dan penggunaan memori yang lebih baik.
-# - **XGBoost**: Meskipun juga mampu menangani large dataset, membutuhkan lebih banyak tuning dan resource untuk mencapai kinerja yang sama seperti LightGBM.
-# 
-# 3. **training Paralel dan GPU**:
-# - **LightGBM**: Mendukung training paralel dan GPU support, yang dapat lebih mempercepat waktu training. 
-# - **XGBoost**: Juga mendukung training paralel dan GPU, tetapi implementasi dalam LightGBM sering dianggap lebih efisien.
-# 
-# 4. **accuracy dan Performance**:
-# Baik LightGBM maupun XGBoost dikenal karena accuracy dan robustness yang tinggi. Pilihan di antara keduanya sering kali bergantung pada dataset dan problemnya. LightGBM mungkin memiliki keunggulan dalam hal kecepatan dan penanganan large dataset, sementara XGBoost dikenal karena fleksibilitasnya dan tuning parameter yang luas.
-# 
-# 5. **Strategi tree growth**:
-# - **LightGBM**: Menumbuhkan pohon dari daun ke daun, yang dapat menghasilkan pohon yang lebih dalam dan berpotensi lebih akurat.
-# - **XGBoost**: Menumbuhkan pohon dari tingkat ke tingkat, yang dapat lebih seimbang tetapi mungkin kurang efisien dalam beberapa kasus.
-
-# %%
-y_pred_tr_lgbm = LGBMModel.predict(X_train)
-y_pred_ts_lgbm = LGBMModel.predict(X_test)
-
-medae_train = median_absolute_error(y_train, y_pred_tr_lgbm)
-medae_test = median_absolute_error(y_test, y_pred_ts_lgbm)
-medae_diff = medae_test - medae_train
-mae_train = mean_absolute_error(y_train, y_pred_tr_lgbm)
-mae_test = mean_absolute_error(y_test, y_pred_ts_lgbm)
-mae_diff = mae_test - mae_train
-mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_lgbm)
-mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_lgbm)
-
-row = {
-    'model_name': 'LightBGM Regression',
-    'MedAE_train': medae_train,
-    'MedAE_Test': medae_test,
-    'MedAE_diff': medae_diff,
-    'MAE_train': mae_train,
-    'MAE_Test': mae_test,
-    'MAE_diff': mae_diff,
-    'MAPE_train': mape_train,
-    'MAPE_Test': mape_test
-}
+# row = {
+#     'model_name': 'Tuned XGBoost Regression',
+#     'MedAE_train': medae_train,
+#     'MedAE_Test': medae_test,
+#     'MedAE_diff': medae_diff,
+#     'MAE_train': mae_train,
+#     'MAE_Test': mae_test,
+#     'MAE_diff': mae_diff,
+#     'MAPE_train': mape_train,
+#     'MAPE_Test': mape_test
+# }
 
 
-# scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
-scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
+# # scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
+# scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
 
-print(f"""
-    LightBGM Regression : 
-    train MedAE score : {medae_train}
-    test MedAE score : {medae_test}
-    train MAE Score : {mae_train}
-    test MAE Score : {mae_test}
-""")
+# print(f"""
+#     Tuned XGBoost Regression : 
+#     train MedAE score : {medae_train}
+#     test MedAE score : {medae_test}
+#     train MAE Score : {mae_train}
+#     test MAE Score : {mae_test}
+# """)
+
+# # %% [markdown]
+# # ### LightGBM
+
+# # %%
+# LGBMModel = Pipeline([
+#     ('preprocessor', preprocessornd),
+#     ('stacking_regressor', LGBMRegressor())
+# ])
+
+# LGBMModel.fit(X_train, y_train)
+
+# # %% [markdown]
+# # LightGBM adlah sebuah gradient boosting framework yang menggunakan tree based learning algorithm, yang di design untuk di-distribusikan dan efficient. 
+# # perbedaannya XGBoost,
+# # 1. **Kecepatan dan Efisiensi**:
+# # - **LightGBM**: Menggunakan algorithm berbasis histogram dan mendukung pertumbuhan pohon berdasarkan leaf-wise (best-first). Hal ini memungkinkan LightGBM menjadi lebih cepat dan lebih hemat memori, terutama dengan large dataset.
+# # - **XGBoost**: Menggunakan pertumbuhan pohon depth-wise (kedalaman), yang dapat lebih lambat dan menghabiskan lebih banyak memori dibandingkan dengan LightGBM.
+# # 
+# # 2. **Penanganan largedataset**:
+# # - **LightGBM**: Dapat menangani large dataset dengan lebih efisien karena pendekatan berbasis histogram dan penggunaan memori yang lebih baik.
+# # - **XGBoost**: Meskipun juga mampu menangani large dataset, membutuhkan lebih banyak tuning dan resource untuk mencapai kinerja yang sama seperti LightGBM.
+# # 
+# # 3. **training Paralel dan GPU**:
+# # - **LightGBM**: Mendukung training paralel dan GPU support, yang dapat lebih mempercepat waktu training. 
+# # - **XGBoost**: Juga mendukung training paralel dan GPU, tetapi implementasi dalam LightGBM sering dianggap lebih efisien.
+# # 
+# # 4. **accuracy dan Performance**:
+# # Baik LightGBM maupun XGBoost dikenal karena accuracy dan robustness yang tinggi. Pilihan di antara keduanya sering kali bergantung pada dataset dan problemnya. LightGBM mungkin memiliki keunggulan dalam hal kecepatan dan penanganan large dataset, sementara XGBoost dikenal karena fleksibilitasnya dan tuning parameter yang luas.
+# # 
+# # 5. **Strategi tree growth**:
+# # - **LightGBM**: Menumbuhkan pohon dari daun ke daun, yang dapat menghasilkan pohon yang lebih dalam dan berpotensi lebih akurat.
+# # - **XGBoost**: Menumbuhkan pohon dari tingkat ke tingkat, yang dapat lebih seimbang tetapi mungkin kurang efisien dalam beberapa kasus.
+
+# # %%
+# y_pred_tr_lgbm = LGBMModel.predict(X_train)
+# y_pred_ts_lgbm = LGBMModel.predict(X_test)
+
+# medae_train = median_absolute_error(y_train, y_pred_tr_lgbm)
+# medae_test = median_absolute_error(y_test, y_pred_ts_lgbm)
+# medae_diff = medae_test - medae_train
+# mae_train = mean_absolute_error(y_train, y_pred_tr_lgbm)
+# mae_test = mean_absolute_error(y_test, y_pred_ts_lgbm)
+# mae_diff = mae_test - mae_train
+# mape_train = mean_absolute_percentage_error(y_train, y_pred_tr_lgbm)
+# mape_test = mean_absolute_percentage_error(y_test, y_pred_ts_lgbm)
+
+# row = {
+#     'model_name': 'LightBGM Regression',
+#     'MedAE_train': medae_train,
+#     'MedAE_Test': medae_test,
+#     'MedAE_diff': medae_diff,
+#     'MAE_train': mae_train,
+#     'MAE_Test': mae_test,
+#     'MAE_diff': mae_diff,
+#     'MAPE_train': mape_train,
+#     'MAPE_Test': mape_test
+# }
+
+
+# # scores = pd.concat([scores, pd.DataFrame(row)], ignore_index=True)
+# scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
+
+# print(f"""
+#     LightBGM Regression : 
+#     train MedAE score : {medae_train}
+#     test MedAE score : {medae_test}
+#     train MAE Score : {mae_train}
+#     test MAE Score : {mae_test}
+# """)
 
 # %% [markdown]
 # ### Tuned LightGBM
@@ -2539,62 +2539,62 @@ scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
 # # %% [markdown]
 # # #### Tuned LightBGM
 
-# %%
-TunedTypeLGBMModel = Pipeline([
-    ('preprocessor', preprocessorndType),
-    ('regressor', LGBMRegressor(random_state=42, force_row_wise=True))
-])
+# # %%
+# TunedTypeLGBMModel = Pipeline([
+#     ('preprocessor', preprocessorndType),
+#     ('regressor', LGBMRegressor(random_state=42, force_row_wise=True))
+# ])
 
-skf = KFold(n_splits=5, random_state=42, shuffle=True)
-param_LGBM = { 
-    'regressor__max_depth' : list(range(2, 150, 2)) + [None],
-    'regressor__num_leaves' : list(range(5, 32, 2)) + [None],
-    'regressor__learning_rate': np.arange(0.01, 0.21, 0.02),
-    'regressor__n_estimators': [50, 100, 300, 500],
-    'regressor__reg_alpha': np.arange(0, 1, 0.2),
-    'regressor__reg_lambda': np.arange(0, 1, 0.2)
-}
+# skf = KFold(n_splits=5, random_state=42, shuffle=True)
+# param_LGBM = { 
+#     'regressor__max_depth' : list(range(2, 150, 2)) + [None],
+#     'regressor__num_leaves' : list(range(5, 32, 2)) + [None],
+#     'regressor__learning_rate': np.arange(0.01, 0.21, 0.02),
+#     'regressor__n_estimators': [50, 100, 300, 500],
+#     'regressor__reg_alpha': np.arange(0, 1, 0.2),
+#     'regressor__reg_lambda': np.arange(0, 1, 0.2)
+# }
 
-scoring = { 'Median_Absolute_Error': 'neg_median_absolute_error', 'Mean_Absolute_Error': 'neg_mean_absolute_error' }
+# scoring = { 'Median_Absolute_Error': 'neg_median_absolute_error', 'Mean_Absolute_Error': 'neg_mean_absolute_error' }
 
-RSCV_T_LGBM = RandomizedSearchCV(TunedTypeLGBMModel, param_LGBM, cv=skf, scoring=scoring, refit='Median_Absolute_Error', n_jobs=12)
-RSCV_T_LGBM.fit(X_Type_train, y_train)
+# RSCV_T_LGBM = RandomizedSearchCV(TunedTypeLGBMModel, param_LGBM, cv=skf, scoring=scoring, refit='Median_Absolute_Error', n_jobs=12)
+# RSCV_T_LGBM.fit(X_Type_train, y_train)
 
-best_params = {k.split('__')[1]: v for k, v in RSCV_T_LGBM.best_params_.items() if k.split('__')[1] in ['max_depth', 'num_leaves', 'learning_rate', 'n_estimators', 'reg_alpha', 'reg_lambda']}
+# best_params = {k.split('__')[1]: v for k, v in RSCV_T_LGBM.best_params_.items() if k.split('__')[1] in ['max_depth', 'num_leaves', 'learning_rate', 'n_estimators', 'reg_alpha', 'reg_lambda']}
 
-BestTypeLGBMModel = Pipeline([
-    ('preprocessor', preprocessorndType),
-    ('regressor', LGBMRegressor(**best_params,  force_row_wise=True))
-])
+# BestTypeLGBMModel = Pipeline([
+#     ('preprocessor', preprocessorndType),
+#     ('regressor', LGBMRegressor(**best_params,  force_row_wise=True))
+# ])
 
-# Fit the pipeline on the training data
-BestTypeLGBMModel.fit(X_Type_train, y_train)
+# # Fit the pipeline on the training data
+# BestTypeLGBMModel.fit(X_Type_train, y_train)
 
-y_pred_tr = BestTypeLGBMModel.predict(X_Type_train)
-y_pred_ts = BestTypeLGBMModel.predict(X_Type_test)
+# y_pred_tr = BestTypeLGBMModel.predict(X_Type_train)
+# y_pred_ts = BestTypeLGBMModel.predict(X_Type_test)
 
-medae_train = median_absolute_error(y_train, y_pred_tr)
-medae_test = median_absolute_error(y_test, y_pred_ts)
-medae_diff = medae_test - medae_train
-mae_train = mean_absolute_error(y_train, y_pred_tr)
-mae_test = mean_absolute_error(y_test, y_pred_ts)
-mae_diff = mae_test - mae_train
-mape_train = mean_absolute_percentage_error(y_train, y_pred_tr) 
-mape_test = mean_absolute_percentage_error(y_test, y_pred_ts)
+# medae_train = median_absolute_error(y_train, y_pred_tr)
+# medae_test = median_absolute_error(y_test, y_pred_ts)
+# medae_diff = medae_test - medae_train
+# mae_train = mean_absolute_error(y_train, y_pred_tr)
+# mae_test = mean_absolute_error(y_test, y_pred_ts)
+# mae_diff = mae_test - mae_train
+# mape_train = mean_absolute_percentage_error(y_train, y_pred_tr) 
+# mape_test = mean_absolute_percentage_error(y_test, y_pred_ts)
 
-row = {
-    'model_name': 'LightBGM Regression (Type)',
-    'MedAE_train': medae_train,
-    'MedAE_Test': medae_test,
-    'MedAE_diff': medae_diff,
-    'MAE_train': mae_train,
-    'MAE_Test': mae_test,
-    'MAE_diff': mae_diff,
-    'MAPE_train': mape_train,
-    'MAPE_Test': mape_test
-}
+# row = {
+#     'model_name': 'LightBGM Regression (Type)',
+#     'MedAE_train': medae_train,
+#     'MedAE_Test': medae_test,
+#     'MedAE_diff': medae_diff,
+#     'MAE_train': mae_train,
+#     'MAE_Test': mae_test,
+#     'MAE_diff': mae_diff,
+#     'MAPE_train': mape_train,
+#     'MAPE_Test': mape_test
+# }
 
-scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
+# scores = pd.concat([scores, pd.DataFrame([row])], ignore_index=True)
 
 # %% [markdown]
 # #### Tuned Gradient Boosting
