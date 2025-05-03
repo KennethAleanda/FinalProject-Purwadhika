@@ -59,6 +59,7 @@ data set berisi mobil bekas sebanyak 8035 records yang diambil dari syarah.com. 
 | Price | int - Ratio| harga mobil |
 | Negotiable | bool - Bool| negosiasi harga mobil |
 
+[link](https://drive.google.com/file/d/11LrIHJAuM2ZPuV_0kgv0hXMmj7cHr66-/view?usp=sharing)
 
 
 [^1]:https://www.kenresearch.com/industry-reports/singapore-use-car-market  
